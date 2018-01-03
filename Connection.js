@@ -24,10 +24,13 @@ var Connection = module.exports = function Connection(config, cb) {
 Connection.prototype._buildConnection = function _buildConnection(cb) {
 
   var host = this.config.host;
+  var bucketPassword = this.config.bucketPassword;
+  var username = this.config.username;
   var password = this.config.password;
 
   var cluster = new couchbase.Cluster('couchbase://' + host);
-  ottoman.bucket = cluster.openBucket(this.config.bucket, password, function(err){
+  cluster.authenticate(username, password);
+  ottoman.bucket = cluster.openBucket(this.config.bucket, bucketPassword, function(err){
     if (err) {
       console.error('Error Connecting CouchBase: %j', err);
       cb(err);
