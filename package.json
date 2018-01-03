@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lan-nguyen91/couchbase-waterline"
+    "url": "git+https://github.com/ryd0rz/couchbase-waterline"
   },
   "keywords": [
     "couchbase",
@@ -51,7 +51,7 @@
   "bugs": {
     "url": "https://github.com/lan-nguyen91/couchbase-waterline/issues"
   },
-  "homepage": "https://github.com/lan-nguyen91/couchbase-waterline#readme",
+  "homepage": "https://github.com/ryd0rz/couchbase-waterline#readme",
   "directories": {
     "test": "test"
   }
