@@ -105,7 +105,7 @@ module.exports = (function () {
      * @param  {Function} cb         [description]
      * @return {[type]}              [description]
      */
-    registerCollection: function(connection, collections, cb) {
+    registerDatastore: function registerDatastore(datastoreConfig, models, cb) {
       if(!connection.identity) return cb(Errors.IdentityMissing);
       if(connections[connection.identity]) return cb(Errors.IdentityDuplicate);
 
