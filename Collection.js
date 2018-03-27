@@ -106,10 +106,10 @@ Collection.prototype._ensureIndices = function (cb) {
   this.connection.ensureIndices(function(err) {
     if (err) {
       console.error(err)
-      cb(err);
+      return cb(err);
     };
     self.isEnsureIndices = true;
-    cb(null, true);
+    return cb(null, true);
   });
 }
 
@@ -194,7 +194,10 @@ Collection.prototype.find = function(query, cb) {
     if (_.isArray(mDoc)) _.map(mDoc, function(doc) {return self.normalizeId(doc)});
     else mDoc = self.normalizeId(mDoc);
 
-    cb(null, mDoc);
+    if (mDoc){
+      return cb(null, mDoc);
+    }
+    return cb('Error finding dataError: An unknown N1QL error occured. This is usually related to an out-of-memory condition.', null);
   })
 
 }
@@ -212,12 +215,12 @@ Collection.prototype.create = function (values, cb) {
 
     if (err) {
       console.error(err);
-      cb(err);
+      return cb(err);
     }
 
     newDocument = self.normalizeId(values);
 
-    cb(null, newDocument)
+    return cb(null, newDocument);
   });
 }
 
@@ -227,7 +230,7 @@ Collection.prototype.destroy = function (values, cb) {
   this.find(values, function(err, result){
     if (err) {
       console.error(err);
-      cb(err);
+      return cb(err);
     }
 
     if (_.isEmpty(result)) cb(null, []);
@@ -250,15 +253,17 @@ Collection.prototype.destroy = function (values, cb) {
           function(finalErr, removeResult){
 
             if (err) cb(finalErr)
-            cb(null, removeResult);
+            return cb(null, removeResult);
           })
       }
       else {
         result = self.deNormalizeId(result);
         result.remove(function(err, result){
-          if (err) cb(err)
+          if (err) {
+            return cb(err);
+          }
           result = self.normalizeId(result);
-          cb(null, result);
+          return cb(null, result);
         })
       }
     }
@@ -272,7 +277,7 @@ Collection.prototype.update = function (option, values, cb) {
   this.find(option, function(err, result){
     if (err) {
       console.error(err);
-      cb(err);
+      return cb(err);
     }
 
     if (_.isArray(result)) {
@@ -288,16 +293,18 @@ Collection.prototype.update = function (option, values, cb) {
         rel = self.deNormalizeId(rel);
         rel.save(function(err){
           if (err) {
-            cbUpdate(err);
+            return cbUpdate(err);
           }
 
           rel = self.normalizeId(rel);
-          cbUpdate(null, rel);
+          return cbUpdate(null, rel);
 
         })} ,  // end remove
         function(finalErr, updateResult){
-          if (err) cb(finalErr)
-          cb(null, updateResult);
+          if (err) {
+            return cb(finalErr);
+          }
+          return cb(null, updateResult);
         })
     }
     else {
@@ -309,9 +316,11 @@ Collection.prototype.update = function (option, values, cb) {
       result = self.deNormalizeId(result);
 
       result.save(function(err, result){
-        if (err) cb(err)
+        if (err) {
+          return cb(err);
+        }
         result = self.normalizeId(result);
-        cb(null, result);
+        return cb(null, result);
       })
     }
   })
@@ -319,13 +328,17 @@ Collection.prototype.update = function (option, values, cb) {
 
 Collection.prototype.deNormalizeId = function(obj) {
   if ( !!obj.id ) obj._id = obj.id;
-  delete obj.id;
+  if (obj && obj.id) {
+    delete obj.id;
+  }
   return obj;
 }
 
 Collection.prototype.normalizeId = function(obj) {
   if ( !!obj._id ) obj.id = obj._id;
-  delete obj._id;
+  if (obj && obj._id) {
+    delete obj._id;
+  }
   return obj;
 }
 
@@ -336,8 +349,11 @@ Collection.prototype.drop = function (collectionName, bucketName, cb) {
   var query = N1qlQuery.fromString('DELETE FROM ' + bucketName + ' WHERE _type=' + '"' + collectionName + '"');
 
   this.connection.bucket.query(query, function(err, result) {
-    if (err) cb(err);
-    else cb(null, result);
+    if (err) {
+      return cb(err);
+    } else {
+      return cb(null, result);
+    }
   })
 
 }
